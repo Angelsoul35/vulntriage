@@ -19,9 +19,14 @@ the data flow.
 
 ## Data flow
 
-```
- finding ─▶ score() ─▶ (score, priority, SLA, factors) ─▶ advisor.note() ─▶ TriageResult
- backlog ─▶ triage() ─▶ sort by score desc ─▶ worklist
+```mermaid
+flowchart LR
+    A[Backlog] --> B["triage()"]
+    B --> C[Finding]
+    C --> D["score()"]
+    D -->|"score, priority, SLA, factors"| E["advisor.note()"]
+    E --> F[TriageResult]
+    F -->|sort by score desc| G[Worklist]
 ```
 
 ## Severity is not priority

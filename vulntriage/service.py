@@ -52,8 +52,7 @@ class TriageService:
             "priority": result.priority.value,
             "sla_days": result.sla_days,
             "factors": [
-                {"name": f.name, "points": f.points, "detail": f.detail}
-                for f in result.factors
+                {"name": f.name, "points": f.points, "detail": f.detail} for f in result.factors
             ],
             "recommendation": result.recommendation,
             "note_source": result.note_source,

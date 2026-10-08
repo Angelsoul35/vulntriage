@@ -56,14 +56,22 @@ def _priority(score: float) -> tuple[Priority, int]:
 def score_factors(finding: Finding) -> list[Factor]:
     asset: AssetContext = finding.asset
     factors = [
-        Factor("cvss", round(finding.cvss_base * 4.0, 1),
-               f"CVSS base {finding.cvss_base} (×4)"),
-        Factor("exploit_maturity", _EXPLOIT_POINTS[finding.exploit_maturity],
-               f"exploit maturity: {finding.exploit_maturity.value}"),
-        Factor("criticality", _CRITICALITY_POINTS[asset.criticality],
-               f"asset criticality: {asset.criticality.value}"),
-        Factor("data_sensitivity", _DATA_POINTS[asset.data_sensitivity],
-               f"data sensitivity: {asset.data_sensitivity.value}"),
+        Factor("cvss", round(finding.cvss_base * 4.0, 1), f"CVSS base {finding.cvss_base} (×4)"),
+        Factor(
+            "exploit_maturity",
+            _EXPLOIT_POINTS[finding.exploit_maturity],
+            f"exploit maturity: {finding.exploit_maturity.value}",
+        ),
+        Factor(
+            "criticality",
+            _CRITICALITY_POINTS[asset.criticality],
+            f"asset criticality: {asset.criticality.value}",
+        ),
+        Factor(
+            "data_sensitivity",
+            _DATA_POINTS[asset.data_sensitivity],
+            f"data sensitivity: {asset.data_sensitivity.value}",
+        ),
     ]
     if asset.internet_facing:
         factors.append(Factor("exposure", 15.0, "asset is internet-facing"))

@@ -16,8 +16,10 @@ def demo() -> None:
     results = service.triage(SAMPLE_BACKLOG)
     print("2) Prioritised worklist (highest risk first):")
     for r in results:
-        print(f"   [{r.priority.value}] score {r.score:>5}  SLA {r.sla_days:>3}d  "
-              f"{r.cve}  ({r.finding_id})")
+        print(
+            f"   [{r.priority.value}] score {r.score:>5}  SLA {r.sla_days:>3}d  "
+            f"{r.cve}  ({r.finding_id})"
+        )
         drivers = ", ".join(f"{f.name}+{f.points:g}" for f in r.factors)
         print(f"        drivers: {drivers}")
         print(f"        fix [{r.note_source}]: {r.recommendation}")

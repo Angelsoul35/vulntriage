@@ -21,12 +21,26 @@ def test_api_triage_ranks():
     resp = client.post(
         "/triage",
         json=[
-            {"id": "A", "cve": "CVE-1", "cvss_base": 10.0, "exploit_maturity": "weaponized",
-             "asset_name": "api", "internet_facing": True, "criticality": "high",
-             "data_sensitivity": "sensitive"},
-            {"id": "B", "cve": "CVE-2", "cvss_base": 4.0, "exploit_maturity": "none",
-             "asset_name": "lab", "internet_facing": False, "criticality": "low",
-             "data_sensitivity": "none"},
+            {
+                "id": "A",
+                "cve": "CVE-1",
+                "cvss_base": 10.0,
+                "exploit_maturity": "weaponized",
+                "asset_name": "api",
+                "internet_facing": True,
+                "criticality": "high",
+                "data_sensitivity": "sensitive",
+            },
+            {
+                "id": "B",
+                "cve": "CVE-2",
+                "cvss_base": 4.0,
+                "exploit_maturity": "none",
+                "asset_name": "lab",
+                "internet_facing": False,
+                "criticality": "low",
+                "data_sensitivity": "none",
+            },
         ],
     )
     assert resp.status_code == 200
@@ -40,8 +54,17 @@ def test_api_empty_and_bad_enum():
     assert client.post("/triage", json=[]).status_code == 422
     bad = client.post(
         "/triage",
-        json=[{"id": "A", "cve": "C", "cvss_base": 5.0, "exploit_maturity": "nope",
-               "asset_name": "x", "criticality": "low", "data_sensitivity": "none"}],
+        json=[
+            {
+                "id": "A",
+                "cve": "C",
+                "cvss_base": 5.0,
+                "exploit_maturity": "nope",
+                "asset_name": "x",
+                "criticality": "low",
+                "data_sensitivity": "none",
+            }
+        ],
     )
     assert bad.status_code == 422
 

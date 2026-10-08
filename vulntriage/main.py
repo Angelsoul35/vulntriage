@@ -45,7 +45,10 @@ class FindingRequest(BaseModel):
 def _to_finding(r: FindingRequest) -> Finding:
     try:
         return Finding(
-            id=r.id, cve=r.cve, title=r.title, cvss_base=r.cvss_base,
+            id=r.id,
+            cve=r.cve,
+            title=r.title,
+            cvss_base=r.cvss_base,
             exploit_maturity=ExploitMaturity(r.exploit_maturity),
             asset=AssetContext(
                 name=r.asset_name,

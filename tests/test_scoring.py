@@ -13,15 +13,20 @@ from vulntriage.scoring import score
 
 def _finding(cvss, maturity, internet, crit, data):
     return Finding(
-        "F", "CVE-X", "t", cvss, maturity,
+        "F",
+        "CVE-X",
+        "t",
+        cvss,
+        maturity,
         AssetContext("a", internet_facing=internet, criticality=crit, data_sensitivity=data),
     )
 
 
 def test_weaponized_internet_crown_jewel_is_p1():
     total, priority, sla, _ = score(
-        _finding(10.0, ExploitMaturity.WEAPONIZED, True, Criticality.HIGH,
-                 DataSensitivity.SENSITIVE)
+        _finding(
+            10.0, ExploitMaturity.WEAPONIZED, True, Criticality.HIGH, DataSensitivity.SENSITIVE
+        )
     )
     assert priority is Priority.P1
     assert sla == 7
@@ -49,8 +54,9 @@ def test_low_severity_isolated_is_p4():
 
 def test_factors_are_decomposable_and_sum_to_score():
     total, _, _, factors = score(
-        _finding(9.0, ExploitMaturity.FUNCTIONAL, True, Criticality.MEDIUM,
-                 DataSensitivity.INTERNAL)
+        _finding(
+            9.0, ExploitMaturity.FUNCTIONAL, True, Criticality.MEDIUM, DataSensitivity.INTERNAL
+        )
     )
     assert round(sum(f.points for f in factors), 1) == total
     names = {f.name for f in factors}

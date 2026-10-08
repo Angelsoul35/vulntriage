@@ -16,9 +16,17 @@ from vulntriage.service import TriageService
 
 def _finding():
     return Finding(
-        "F", "CVE-2021-44228", "Log4Shell", 10.0, ExploitMaturity.WEAPONIZED,
-        AssetContext("api", internet_facing=True, criticality=Criticality.HIGH,
-                     data_sensitivity=DataSensitivity.SENSITIVE),
+        "F",
+        "CVE-2021-44228",
+        "Log4Shell",
+        10.0,
+        ExploitMaturity.WEAPONIZED,
+        AssetContext(
+            "api",
+            internet_facing=True,
+            criticality=Criticality.HIGH,
+            data_sensitivity=DataSensitivity.SENSITIVE,
+        ),
     )
 
 

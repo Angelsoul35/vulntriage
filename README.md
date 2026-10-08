@@ -6,6 +6,12 @@ affects — and produces a **prioritised worklist**: a 0-100 score decomposed in
 named factors, a P1-P4 priority with an SLA, and an LLM-assisted remediation note.
 The point is to rank by *real* risk, not by raw CVSS.
 
+[![CI](https://img.shields.io/badge/CI-GitHub%20Actions-blue)](.github/workflows/ci.yml)
+[![Python](https://img.shields.io/badge/python-3.11%2B-blue)](pyproject.toml)
+[![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+
+---
+
 ## Why raw CVSS is not a priority
 
 A CVSS base score measures a vulnerability's technical severity in isolation. It

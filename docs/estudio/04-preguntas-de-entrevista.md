@@ -17,9 +17,36 @@ con puntos y razones. Puedo explicar "por qué es P1" línea a línea, y si un f
 está mal, se corrige y recalcula.
 
 **¿Por qué reglas y no un modelo aprendido?**
-Porque la priorización debe ser auditable y ajustable por el equipo, el
+Porque la **priorización** debe ser auditable y ajustable por el equipo, el
 conocimiento de dominio es durable (sin deriva), y no hay un ground truth de
 prioridad correcta: es una decisión de política, no una predicción.
+
+**Pero sí usas ML para la severidad. ¿No te contradices?**
+No, y esa es la clave. La prioridad es **política** (sin verdad que aprender); la
+**severidad es un hecho** (el NVD la publica como vector CVSS). Cuando un hallazgo
+llega como texto sin vector, estimar su banda es un problema de predicción legítimo,
+con verdad y con métrica. Lo que es política se codifica en reglas; lo que es hecho
+se aprende.
+
+## Sobre el clasificador de severidad y el dato real
+
+**¿De dónde sale la etiqueta de severidad?**
+Del vector CVSS v3.1 del propio CVE: implemento las ecuaciones canónicas de la
+puntuación base y mapeo a la banda del NVD (LOW/MEDIUM/HIGH/CRITICAL). Las pruebas
+comprueban las ecuaciones contra valores de referencia (Log4Shell = 10,0), así que
+la etiqueta es la severidad oficial, no una aproximación.
+
+**¿Qué resultados obtienes y por qué no son 1,0?**
+0,757 de exactitud en validación cruzada (± 0,009), F1 macro 0,755, con train/test
+0,880/0,753 (brecha 0,127): fuerte y bien ajustado. Es el triple del suelo de 0,25
+de cuatro clases balanceadas. No es 1,0 porque las descripciones reales son variadas
+y las bandas son un corte de una puntuación continua; un 1,0 aquí delataría una fuga.
+
+**¿Cómo demuestras que no hay fuga?**
+Tres cosas: balanceo las clases (suelo limpio de 0,25), deduplico descripciones
+(para que no se filtre un aviso casi idéntico entre train y test), y tengo una
+prueba que **baraja las etiquetas** y comprueba que la exactitud se desploma a ~0,29.
+Si la señal fuera una fuga, barajar no la rompería.
 
 ## Sobre la capa de LLM
 

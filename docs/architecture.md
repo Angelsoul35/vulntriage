@@ -8,14 +8,17 @@ the data flow.
 
 | Layer         | Module                  | Responsibility                                       |
 | ------------- | ----------------------- | ---------------------------------------------------- |
-| Model         | `vulntriage/models.py`  | Findings, asset context, factors, triage result      |
-| Scoring       | `vulntriage/scoring.py` | Additive, decomposable priority score + P1-P4 + SLA  |
-| Notes         | `vulntriage/notes.py`   | LLM remediation note with a templated fallback       |
-| LLM           | `vulntriage/llm/`       | Provider-agnostic client with a fallback cascade     |
-| Orchestration | `vulntriage/service.py` | Score, prioritise, rank, annotate                    |
-| Data          | `vulntriage/samples.py` | A synthetic backlog for the demo and tests           |
-| HTTP API      | `vulntriage/main.py`    | `/triage` over REST                                  |
-| CLI           | `vulntriage/cli.py`     | Demo                                                 |
+| Model         | `vulntriage/models.py`             | Findings, asset context, factors, triage result     |
+| Scoring       | `vulntriage/scoring.py`            | Additive, decomposable priority score + P1-P4 + SLA |
+| Severity (ML) | `vulntriage/severity_classifier.py`| Learned CVSS severity band from a CVE description    |
+| Real data     | `vulntriage/real_data.py`          | NVD CVE loader, CVSS v3.1 label equations, fetch     |
+| Benchmark     | `vulntriage/real_benchmark.py`     | Train & measure the severity model on real CVEs      |
+| Notes         | `vulntriage/notes.py`              | LLM remediation note with a templated fallback      |
+| LLM           | `vulntriage/llm/`                  | Provider-agnostic client with a fallback cascade     |
+| Orchestration | `vulntriage/service.py`            | Score, prioritise, rank, annotate                   |
+| Data          | `vulntriage/samples.py`            | A synthetic backlog for the demo and tests          |
+| HTTP API      | `vulntriage/main.py`               | `/triage` over REST                                 |
+| CLI           | `vulntriage/cli.py`                | Demo                                                |
 
 ## Data flow
 
@@ -58,6 +61,26 @@ ground-truth "correct priority" dataset to train on — priority is a policy cho
 not a fact to be predicted. This is the same learning-vs-policy split used across
 the portfolio: the judgement with consequences stays explicit.
 
+## The learned severity classifier, and why ML *here*
+
+Severity sits on the other side of that split. Unlike priority, a vulnerability's
+severity *is* a fact: the NVD assigns every CVE a CVSS vector, and the base score
+maps to a qualitative band. So when a finding arrives as a free-text description
+with no vector attached, estimating its band is a genuine prediction problem with a
+ground truth to learn and to measure against. `SeverityClassifier` does exactly
+that — word + character TF-IDF into a regularised multinomial logistic regression,
+kept linear so the driving terms are inspectable — and feeds the band into the CVSS
+factor the rule-based score already consumes.
+
+`real_data.py` loads a balanced subset of the real NVD-derived
+`harinpurumandla/cve-severity-dataset`, deriving each label from the CVE's CVSS
+v3.1 vector with the canonical base-score equations (so the ground truth is the
+authoritative NVD rating). `real_benchmark.py` trains the classifier on it and
+reports cross-validated accuracy, macro/weighted F1, the train/test gap and the
+confusion matrix, with a plain verdict (underfit / overfit / well-fit). The
+measured result is ~0.76 accuracy, three times the four-class baseline, well-fit —
+see the README and `docs/estudio/`.
+
 ## The notes layer
 
 Scoring decides priority; the notes layer only writes the prose recommendation.
@@ -73,4 +96,7 @@ or the fallback.
   `_DATA_POINTS`, the CVSS multiplier and the level thresholds are plain data.
 - **New signals.** An EPSS probability or a known-exploited-vulnerabilities flag
   is a new `Factor`; the additive model absorbs it without restructuring.
+- **Severity from prose.** When a finding has a description but no CVSS vector,
+  `SeverityClassifier` estimates the band that drives the CVSS factor; retrain it
+  on your own corpus with `real_benchmark` to keep it current.
 - **Notes.** The prompt and the templated fallback live in one module.
